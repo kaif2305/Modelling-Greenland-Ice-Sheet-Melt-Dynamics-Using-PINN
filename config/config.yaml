@@ -1,0 +1,9 @@
+artifacts_root: artifacts
+
+data_ingestion:
+  root_dir: artifacts/data_ingestion
+  base_url: "https://test-thredds.geus.dk/thredds/fileServer/aws/l2stations/csv/"
+  local_data_dir: artifacts/data_ingestion/daily_data
+  stations: 
+    - "KAN_L"
+    - "EGP"

@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: mlProject
+Version: 0.0.0
+Summary: A small python package for ml app
+Home-page: https://github.com/kaif2305/Modelling-Greenland-Ice-Sheet-Melt-Dynamics-Using-PINN
+Author: kaif2305
+Author-email: 23kaif05@gmail.com
+Project-URL: Bug Tracker, https://github.com/kaif2305/Modelling-Greenland-Ice-Sheet-Melt-Dynamics-Using-PINN/issues
+Description-Content-Type: text/markdown
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: project-url
+Dynamic: summary
+
+# Modelling-Greenland-Ice-Sheet-Melt-Dynamics-Using-PINN
