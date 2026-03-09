@@ -8,3 +8,10 @@ class DataIngestionConfig:
     base_url: str
     stations: List[str]
     local_data_dir: Path
+
+@dataclass(frozen=True)
+class DataAnalysisConfig:
+    root_dir: Path
+    input_data_dir: Path
+    reports_dir: Path
+    target_variables: List[str]

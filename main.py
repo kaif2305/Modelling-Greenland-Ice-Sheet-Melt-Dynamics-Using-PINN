@@ -1,5 +1,6 @@
 from mlProject import logger
 from mlProject.pipeline.stage_01_data_ingestion import DataIngestionPipeline
+from mlProject.pipeline.stage_01_1_data_analysis import DataAnalysisTrainingPipeline
 # import dagshub
 import mlflow
 
@@ -15,6 +16,16 @@ try:
     data_ingestion_pipeline = DataIngestionPipeline()
     data_ingestion_pipeline.main()
     logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\n")
+except Exception as e:
+    logger.exception(e)
+    raise e
+
+STAGE_NAME = "Data Analysis Stage"
+try:
+    logger.info(f">>>>>> stage {STAGE_NAME} started <<<<<<")
+    data_analysis_pipeline = DataAnalysisTrainingPipeline()
+    data_analysis_pipeline.main()
+    logger.info(f">>>>>> stage {STAGE_NAME} completed <<<<<<\n\nx==========x")
 except Exception as e:
     logger.exception(e)
     raise e

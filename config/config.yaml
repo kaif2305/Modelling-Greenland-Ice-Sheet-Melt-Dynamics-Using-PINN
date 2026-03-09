@@ -7,3 +7,12 @@ data_ingestion:
   stations: 
     - "KAN_L"
     - "EGP"
+    - "KAN_M"
+
+
+data_analysis:
+  root_dir: artifacts/data_analysis
+  input_data_dir: artifacts/data_ingestion/daily_data
+  clean_data_path: artifacts/data_analysis/promice_clean_combined.csv
+  plots_dir: artifacts/data_analysis/plots
+  reports_dir: artifacts/data_analysis/reports

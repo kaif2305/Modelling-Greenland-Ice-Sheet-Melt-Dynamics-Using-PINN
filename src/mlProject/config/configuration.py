@@ -1,6 +1,7 @@
 from mlProject.constants import *
 from mlProject.utils.common import read_yaml, create_directories
-from mlProject.entity.config_entity import DataIngestionConfig
+from mlProject.entity.config_entity import (DataIngestionConfig, 
+                                            DataAnalysisConfig)
 
 class ConfigurationManager:
     def __init__(
@@ -28,3 +29,27 @@ class ConfigurationManager:
         )
 
         return data_ingestion_config
+    
+    def get_data_analysis_config(self) -> DataAnalysisConfig:
+        config = self.config.data_analysis
+        schema = self.schema
+
+        # 1. Dynamically build the target variables list from schema.yaml
+        feature_columns = list(schema.columns.keys())
+        target_column = schema.target_column.name
+        
+        # Combine and de-duplicate
+        target_variables = list(set(feature_columns + [target_column]))
+
+        # 2. Create the directories for analysis reports
+        create_directories([Path(config.root_dir), Path(config.reports_dir)])
+
+        # 3. Build the config object
+        data_analysis_config = DataAnalysisConfig(
+            root_dir=Path(config.root_dir),
+            input_data_dir=Path(config.input_data_dir),
+            reports_dir=Path(config.reports_dir),
+            target_variables=target_variables
+        )
+
+        return data_analysis_config

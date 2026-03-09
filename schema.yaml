@@ -1,1 +1,30 @@
-key: value
+# ==========================================
+# Expected Input Features & Data Types
+# ==========================================
+columns:
+  # Location Data
+  gps_lat: float64
+  gps_lon: float64
+  gps_alt: float64
+  
+  # Primary Sensors (Upper Boom)
+  t_u: float64
+  rh_u: float64
+  wspd_u: float64
+  precip_u: float64
+  
+  # Backup Sensors (Lower Boom)
+  t_l: float64
+  rh_l: float64
+  wspd_l: float64
+  precip_l: float64
+  
+  # Surface Variables
+  albedo: float64
+  t_surf: float64
+
+# ==========================================
+# Target Variable for Neural Network
+# ==========================================
+target_column:
+  name: t_surf
