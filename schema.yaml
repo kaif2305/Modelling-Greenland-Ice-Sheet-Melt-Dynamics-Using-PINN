@@ -2,6 +2,10 @@
 # Expected Input Features & Data Types
 # ==========================================
 columns:
+
+  # Time Stamp
+  time: datetime64[ns]
+
   # Location Data
   gps_lat: float64
   gps_lon: float64
@@ -11,13 +15,13 @@ columns:
   t_u: float64
   rh_u: float64
   wspd_u: float64
-  precip_u: float64
+  # precip_u: float64
   
   # Backup Sensors (Lower Boom)
-  t_l: float64
-  rh_l: float64
-  wspd_l: float64
-  precip_l: float64
+  # t_l: float64
+  # rh_l: float64
+  # wspd_l: float64
+  # precip_l: float64
   
   # Surface Variables
   albedo: float64

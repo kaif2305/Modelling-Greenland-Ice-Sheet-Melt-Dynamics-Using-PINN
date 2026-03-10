@@ -32,16 +32,25 @@ class DataAnalysis:
                 # Load the dataset
                 df = pd.read_csv(file_path, index_col=0, parse_dates=True)
                 
-                # Filter for variables that exist in BOTH the schema and the CSV
-                available_vars = [var for var in self.config.target_variables if var in df.columns]
+                # 1. Filter for variables that exist strictly as columns
+                existing_cols = [var for var in self.config.target_variables if var in df.columns]
                 
-                # Identify if any schema columns are completely missing from the station
-                missing_vars = [var for var in self.config.target_variables if var not in df.columns]
+                # 2. Identify variables that are missing from BOTH columns AND the index
+                missing_vars = [
+                    var for var in self.config.target_variables 
+                    if var not in df.columns and var != df.index.name and var != "time"
+                ]
+                
                 if missing_vars:
                     logger.warning(f"Station {station_name} is completely missing schema columns: {missing_vars}")
 
-                # Calculate missing values
-                null_counts = df[available_vars].isnull().sum().to_dict()
+                # 3. Calculate missing values for the actual columns
+                null_counts = df[existing_cols].isnull().sum().to_dict()
+                
+                # 4. Safely calculate missing values for the index (time) if required by schema
+                if df.index.name in self.config.target_variables or "time" in self.config.target_variables:
+                    null_counts['time'] = int(df.index.isnull().sum())
+                    
                 total_rows = len(df)
                 
                 # Add to the master report

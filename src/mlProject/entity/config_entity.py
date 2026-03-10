@@ -15,3 +15,12 @@ class DataAnalysisConfig:
     input_data_dir: Path
     reports_dir: Path
     target_variables: List[str]
+
+@dataclass(frozen=True)
+class DataTransformationConfig:
+    root_dir: Path
+    data_path: Path      # Folder containing the daily CSVs
+    transformed_path: Path # Where to save the final merged CSV
+    winter_albedo: float   # 0.85
+    interpolation_limit: int # 7 days
+    stations: list

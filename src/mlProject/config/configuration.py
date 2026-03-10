@@ -1,7 +1,8 @@
 from mlProject.constants import *
 from mlProject.utils.common import read_yaml, create_directories
 from mlProject.entity.config_entity import (DataIngestionConfig, 
-                                            DataAnalysisConfig)
+                                            DataAnalysisConfig,
+                                            DataTransformationConfig)
 
 class ConfigurationManager:
     def __init__(
@@ -53,3 +54,19 @@ class ConfigurationManager:
         )
 
         return data_analysis_config
+    
+    def get_data_transformation_config(self) -> DataTransformationConfig:
+        config = self.config.data_transformation
+        
+        create_directories([config.root_dir])
+
+        data_transformation_config = DataTransformationConfig(
+            root_dir=Path(config.root_dir),
+            data_path=Path(self.config.data_ingestion.local_data_dir),
+            transformed_path=Path(config.transformed_path),
+            winter_albedo=self.params.data_processing.winter_albedo_fill_value,
+            interpolation_limit=self.params.data_processing.max_gap_limit_days,
+            stations=list(self.config.data_ingestion.stations)
+        )
+
+        return data_transformation_config

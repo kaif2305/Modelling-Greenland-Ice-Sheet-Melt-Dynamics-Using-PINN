@@ -13,6 +13,14 @@ data_ingestion:
 data_analysis:
   root_dir: artifacts/data_analysis
   input_data_dir: artifacts/data_ingestion/daily_data
-  clean_data_path: artifacts/data_analysis/promice_clean_combined.csv
-  plots_dir: artifacts/data_analysis/plots
+  # clean_data_path: artifacts/data_analysis/promice_clean_combined.csv
+  # plots_dir: artifacts/data_analysis/plots
   reports_dir: artifacts/data_analysis/reports
+
+data_transformation:
+  root_dir: artifacts/data_transformation
+  data_path: artifacts/data_ingestion/daily_data
+  transformed_path: artifacts/data_transformation/master_space_time_data.csv
+  # Physical & Processing Parameters
+  winter_albedo: 0.85
+  interpolation_limit: 7
