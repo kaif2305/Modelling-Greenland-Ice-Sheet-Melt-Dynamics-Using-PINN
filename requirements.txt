@@ -5,6 +5,7 @@ notebook
 numpy
 scikit-learn
 matplotlib
+seaborn
 python-box
 pyYAML
 tqdm

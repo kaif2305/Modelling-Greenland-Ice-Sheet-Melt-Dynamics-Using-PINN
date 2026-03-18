@@ -4,7 +4,7 @@
 columns:
 
   # Time Stamp
-  time: datetime64[ns]
+  # time: datetime64[ns]
 
   # Location Data
   gps_lat: float64
