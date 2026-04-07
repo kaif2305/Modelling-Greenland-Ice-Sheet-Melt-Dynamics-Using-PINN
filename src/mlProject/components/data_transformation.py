@@ -5,17 +5,21 @@ from mlProject import logger
 from mlProject.entity.config_entity import DataTransformationConfig
 
 class DataTransformation:
-    def __init__(self, config: DataTransformationConfig):
+    def __init__(self, config): # Type hint removed temporarily for standalone execution
         self.config = config
 
     def clean_and_combine(self):
         """
         Main orchestration method:
         1. Cleans individual stations (GPS, Albedo, Time Engineering).
-        2. Merges all stations into one long-format Master Dataset.
-        3. Applies a robust multi-stage backstop to eliminate all input NaNs.
+        2. CROPS the timeline to the 2012 Synchronized Continuous Block.
+        3. Merges all stations into one long-format Master Dataset.
+        4. Applies a robust multi-stage backstop to eliminate all input NaNs.
         """
         combined_list = []
+        
+        # Define the global start date we agreed upon
+        GLOBAL_START_DATE = pd.Timestamp("2012-01-01")
         
         # Use the station list provided by the ConfigurationManager (from config.yaml)
         for station in self.config.stations:
@@ -30,7 +34,15 @@ class DataTransformation:
             # Load data - 'time' becomes the index
             df = pd.read_csv(file_path, index_col=0, parse_dates=True)
 
-            # --- A. Physical & Space Interpolation ---
+            # --- A. TEMPORAL CROPPING (The 2012 Synchronized Block) ---
+            # Drop all rows prior to January 1, 2012 to remove multi-year blackouts
+            df = df[df.index >= GLOBAL_START_DATE]
+            
+            if df.empty:
+                logger.warning(f"Station {station} has no data after {GLOBAL_START_DATE.date()}. Skipping.")
+                continue
+
+            # --- B. Physical & Space Interpolation ---
             # Fill Albedo with the winter constant defined in config.yaml (0.85)
             df['albedo'] = df['albedo'].fillna(self.config.winter_albedo)
 
@@ -38,15 +50,16 @@ class DataTransformation:
             gps_cols = ['gps_lat', 'gps_lon', 'gps_alt']
             df[gps_cols] = df[gps_cols].interpolate(method='linear', limit_direction='both')
 
-            # --- B. Time Engineering for PINN ---
-            # Continuous Time: Days since start of project (Linear 't' input for PDE)
-            df['time_cont'] = (df.index - pd.Timestamp("2008-01-01")).days
+            # --- C. Time Engineering for PINN ---
+            # Continuous Time: Days since GLOBAL_START_DATE (Linear 't' input for PDE)
+            # We updated this from 2008 so the PINN's math starts at t=0
+            df['time_cont'] = (df.index - GLOBAL_START_DATE).days
             
             # Cyclical Time: Sine/Cosine encoding to capture annual seasonality
             df['day_sin'] = np.sin(2 * np.pi * df.index.dayofyear / 365.25)
             df['day_cos'] = np.cos(2 * np.pi * df.index.dayofyear / 365.25)
 
-            # --- C. Metadata & Schema Alignment ---
+            # --- D. Metadata & Schema Alignment ---
             df['station_name'] = station
             
             # Reset index so 'time' is available for the merge
@@ -65,7 +78,7 @@ class DataTransformation:
 
         # --- STEP 2: MERGE STATIONS ---
         master_df = pd.concat(combined_list, axis=0, ignore_index=True)
-        logger.info(f"Step 2: Merged {len(self.config.stations)} stations into master dataset.")
+        logger.info(f"Step 2: Merged {len(self.config.stations)} stations into master dataset (Post-2012).")
 
         # --- STEP 3: THE FINAL BACKSTOP (Robust Input Cleaning) ---
         input_features = ['t_u', 'rh_u', 'wspd_u']
