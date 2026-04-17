@@ -1,34 +1,29 @@
 # ==========================================
-# Expected Input Features & Data Types
+# Transformed Input Features for PINN
 # ==========================================
 columns:
+  # Time Engineering
+  time_cont: int64
+  day_sin: float64
+  day_cos: float64
 
-  # Time Stamp
-  # time: datetime64[ns]
-
-  # Location Data
+  # Spatial Grid
   gps_lat: float64
   gps_lon: float64
   gps_alt: float64
   
-  # Primary Sensors (Upper Boom)
+  # Thermodynamic Drivers
   t_u: float64
   rh_u: float64
   wspd_u: float64
-  # precip_u: float64
-  
-  # Backup Sensors (Lower Boom)
-  # t_l: float64
-  # rh_l: float64
-  # wspd_l: float64
-  # precip_l: float64
-  
-  # Surface Variables
   albedo: float64
+  
+  # Targets & Metadata
+  station_name: object
   t_surf: float64
 
 # ==========================================
-# Target Variable for Neural Network
+# Target Variable & Physics Flags
 # ==========================================
 target_column:
   name: t_surf

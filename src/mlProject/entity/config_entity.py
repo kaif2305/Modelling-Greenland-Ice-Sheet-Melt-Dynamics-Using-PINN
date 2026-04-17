@@ -24,3 +24,31 @@ class DataTransformationConfig:
     winter_albedo: float   # 0.85
     interpolation_limit: int # 7 days
     stations: list
+
+@dataclass(frozen=True)
+class ModelTrainerConfig:
+    # 1. Directory and File Paths (from config.yaml)
+    root_dir: Path
+    clean_data_path: Path
+    trained_model_path: Path
+    loss_log_path: Path
+    
+    # 2. PINN Architecture (from params.yaml)
+    input_dim: int
+    output_dim: int
+    hidden_layers: list
+    activation: str
+    seq_length: int       # NEW: For the LSTM temporal memory window
+    
+    # 3. Training Hyperparameters (from params.yaml)
+    epochs: int
+    batch_size: int
+    learning_rate: float
+    optimizer: str
+    
+    # Note: Physics lambdas removed because the Advanced PINN learns them dynamically!
+    
+    # 4. Data Schema Setup (from schema.yaml / config)
+    target_feature: str
+    collocation_flag: str
+    input_features: list

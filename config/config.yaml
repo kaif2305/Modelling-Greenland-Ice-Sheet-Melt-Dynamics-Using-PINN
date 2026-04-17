@@ -24,3 +24,9 @@ data_transformation:
   # Physical & Processing Parameters
   winter_albedo: 0.85
   interpolation_limit: 7
+
+model_trainer:
+  root_dir: artifacts/model_trainer
+  clean_data_path: artifacts/data_transformation/master_space_time_data.csv
+  trained_model_path: artifacts/model_trainer/pinn_model.pth
+  loss_log_path: artifacts/model_trainer/training_loss_history.csv

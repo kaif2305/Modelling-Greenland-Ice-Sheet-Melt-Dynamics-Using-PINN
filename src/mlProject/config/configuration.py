@@ -2,7 +2,8 @@ from mlProject.constants import *
 from mlProject.utils.common import read_yaml, create_directories
 from mlProject.entity.config_entity import (DataIngestionConfig, 
                                             DataAnalysisConfig,
-                                            DataTransformationConfig)
+                                            DataTransformationConfig,
+                                            ModelTrainerConfig)
 
 class ConfigurationManager:
     def __init__(
@@ -70,3 +71,36 @@ class ConfigurationManager:
         )
 
         return data_transformation_config
+    
+    def get_model_trainer_config(self) -> ModelTrainerConfig:
+        config = self.config.model_trainer
+        params = self.params.model_training
+        schema = self.schema
+        
+        create_directories([config.root_dir])
+
+        # Dynamically extract input features from the schema
+        target_col = schema.target_column.name
+        all_columns = list(schema.columns.keys())
+        input_feats = [col for col in all_columns if col not in [target_col, "station_name"]]
+
+        model_trainer_config = ModelTrainerConfig(
+            root_dir=Path(config.root_dir),
+            clean_data_path=Path(config.clean_data_path),
+            trained_model_path=Path(config.trained_model_path),
+            loss_log_path=Path(config.loss_log_path),
+            input_dim=params.input_dim,
+            output_dim=params.output_dim,
+            hidden_layers=list(params.hidden_layers),
+            activation=params.activation,
+            seq_length=params.seq_length,
+            epochs=params.epochs,
+            batch_size=params.batch_size,
+            learning_rate=params.learning_rate,
+            optimizer=params.optimizer,
+            target_feature=target_col,
+            collocation_flag="t_surf_is_collocation",
+            input_features=input_feats
+        )
+
+        return model_trainer_config

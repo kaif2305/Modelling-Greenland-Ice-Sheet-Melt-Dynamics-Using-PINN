@@ -1,18 +1,19 @@
-tensorflow
 pandas 
-mlflow
-notebook
 numpy
+scipy
+torch
 scikit-learn
 matplotlib
 seaborn
+mlflow
+notebook
 python-box
 pyYAML
+types-PyYAML
 tqdm
 ensure
 joblib
-types-PyYAML
+pyarrow
 Flask
 Flask-Cors
-pyarrow
 -e .

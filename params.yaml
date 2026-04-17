@@ -1,3 +1,18 @@
 data_processing:
   winter_albedo_fill_value: 0.85
   max_gap_limit_days: 7
+
+# NEW: PINN Specific Parameters
+model_training:
+  # Architecture
+  input_dim: 10
+  output_dim: 2          # UPDATED: Now predicting [t_surf, melt_rate]
+  hidden_layers: [64, 64] # LSTM uses fewer, wider layers than MLP
+  activation: "Tanh"
+  seq_length: 7          # NEW: LSTM looks at the past 7 days of weather
+  
+  # Training Loop
+  epochs: 5
+  batch_size: 1024       # Reduced slightly for LSTM memory constraints
+  learning_rate: 0.001
+  optimizer: "Adam"
