@@ -12,14 +12,14 @@ class DataTransformation:
         """
         Main orchestration method:
         1. Cleans individual stations (GPS, Albedo, Time Engineering).
-        2. CROPS the timeline to the 2012 Synchronized Continuous Block.
+        2. CROPS the timeline to the 2016 Synchronized Continuous Block.
         3. Merges all stations into one long-format Master Dataset.
         4. Applies a robust multi-stage backstop to eliminate all input NaNs.
         """
         combined_list = []
         
         # Define the global start date we agreed upon
-        GLOBAL_START_DATE = pd.Timestamp("2012-01-01")
+        GLOBAL_START_DATE = pd.Timestamp("2016-01-01")
         
         # Use the station list provided by the ConfigurationManager (from config.yaml)
         for station in self.config.stations:

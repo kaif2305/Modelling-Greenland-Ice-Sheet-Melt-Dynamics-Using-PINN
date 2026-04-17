@@ -6,27 +6,39 @@ data_ingestion:
   local_data_dir: artifacts/data_ingestion/daily_data
   stations: 
     - "KAN_L"
+    - "KAN_U"
+    - "QAS_L"
+    - "QAS_U"
+    - "TAS_L"
+    - "SCO_L"
+    - "THU_L"
+    - "UPE_U"
+    - "KPC_L"
     - "EGP"
-    - "KAN_M"
-
 
 data_analysis:
   root_dir: artifacts/data_analysis
   input_data_dir: artifacts/data_ingestion/daily_data
-  # clean_data_path: artifacts/data_analysis/promice_clean_combined.csv
-  # plots_dir: artifacts/data_analysis/plots
   reports_dir: artifacts/data_analysis/reports
 
 data_transformation:
   root_dir: artifacts/data_transformation
   data_path: artifacts/data_ingestion/daily_data
   transformed_path: artifacts/data_transformation/master_space_time_data.csv
-  # Physical & Processing Parameters
   winter_albedo: 0.85
   interpolation_limit: 7
 
 model_trainer:
   root_dir: artifacts/model_trainer
   clean_data_path: artifacts/data_transformation/master_space_time_data.csv
-  trained_model_path: artifacts/model_trainer/pinn_model.pth
+  trained_model_path: artifacts/model_trainer/pinn_model.pth  # (We leave this here just in case, but your code will dynamically save as pinn_model_seed_1.pth)
   loss_log_path: artifacts/model_trainer/training_loss_history.csv
+
+model_evaluation:
+  root_dir: artifacts/model_evaluation
+  test_data_path: artifacts/data_transformation/master_space_time_data.csv
+  model_dir: artifacts/model_trainer  # <--- THIS IS THE ONLY CHANGE
+  scaler_X_path: artifacts/model_trainer/scaler_X.joblib
+  scaler_y_path: artifacts/model_trainer/scaler_y.joblib
+  metric_file_name: artifacts/model_evaluation/metrics.json
+  mlflow_uri: "https://dagshub.com/23kaif05/Modelling-Greenland-Ice-Sheet-Melt-Dynamics-Using-PINN.mlflow"

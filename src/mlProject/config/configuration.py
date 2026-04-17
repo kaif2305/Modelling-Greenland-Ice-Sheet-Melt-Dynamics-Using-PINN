@@ -3,7 +3,8 @@ from mlProject.utils.common import read_yaml, create_directories
 from mlProject.entity.config_entity import (DataIngestionConfig, 
                                             DataAnalysisConfig,
                                             DataTransformationConfig,
-                                            ModelTrainerConfig)
+                                            ModelTrainerConfig,
+                                            ModelEvaluationConfig)
 
 class ConfigurationManager:
     def __init__(
@@ -104,3 +105,34 @@ class ConfigurationManager:
         )
 
         return model_trainer_config
+    
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        config = self.config.model_evaluation
+        params = self.params.model_training
+        schema = self.schema
+
+        create_directories([config.root_dir])
+
+        target_col = schema.target_column.name
+        all_columns = list(schema.columns.keys())
+        input_feats = [col for col in all_columns if col not in [target_col, "station_name"]]
+
+        model_evaluation_config = ModelEvaluationConfig(
+            root_dir=Path(config.root_dir),
+            test_data_path=Path(config.test_data_path),
+            model_dir=Path(config.model_dir), # <--- CHANGED THIS LINE
+            scaler_X_path=Path(config.scaler_X_path),
+            scaler_y_path=Path(config.scaler_y_path),
+            metric_file_name=Path(config.metric_file_name),
+            mlflow_uri=config.mlflow_uri,
+            
+            input_dim=params.input_dim,
+            output_dim=params.output_dim,
+            hidden_layers=list(params.hidden_layers),
+            seq_length=params.seq_length,
+            target_feature=target_col,
+            collocation_flag="t_surf_is_collocation",
+            input_features=input_feats
+        )
+
+        return model_evaluation_config

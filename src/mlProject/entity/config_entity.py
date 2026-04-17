@@ -52,3 +52,23 @@ class ModelTrainerConfig:
     target_feature: str
     collocation_flag: str
     input_features: list
+
+
+@dataclass(frozen=True)
+class ModelEvaluationConfig:
+    root_dir: Path
+    test_data_path: Path
+    model_dir: Path
+    scaler_X_path: Path
+    scaler_y_path: Path
+    metric_file_name: Path
+    mlflow_uri: str
+    
+    # We need the architecture params to rebuild the model before loading the weights
+    input_dim: int
+    output_dim: int
+    hidden_layers: list
+    seq_length: int
+    target_feature: str
+    collocation_flag: str
+    input_features: list

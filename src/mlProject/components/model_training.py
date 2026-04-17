@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import random
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -104,11 +105,20 @@ class ModelTrainer:
         
         logger.info(f"Sequencing complete. Total LSTM windows: {len(seq_X)}")
 
-    def train(self):
+    def train(self, seed=42): # <--- CHANGED: Now accepts a seed argument
         """
         Main orchestration method:
-        Runs the Physics-Informed training loop using Explicit Surface Energy Balance.
+        Runs the Physics-Informed training loop with Seed Locking and Unique Saving.
         """
+        # 1. LOCK THE SEEDS (Crucial for an Ensemble!)
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+        logger.info(f"Locked random seed to: {seed}")
+
+        # Prepare data and initialize model
         self.prepare_data()
         
         model = AdvancedPINN(
@@ -119,14 +129,14 @@ class ModelTrainer:
         
         optimizer = optim.Adam(model.parameters(), lr=self.config.learning_rate)
         
-        # Map feature column indices dynamically from config
+        # Map feature column indices dynamically
         IDX_SIN = self.config.input_features.index('day_sin')
         IDX_COS = self.config.input_features.index('day_cos')
         IDX_TU = self.config.input_features.index('t_u')
         IDX_WSPD = self.config.input_features.index('wspd_u')
         IDX_ALB = self.config.input_features.index('albedo')
 
-        logger.info("Step 2: Starting Advanced Surface Energy Balance PINN Training...")
+        logger.info(f"Step 2: Training Advanced PINN (Seed {seed})...")
         loss_history = []
         
         for epoch in range(self.config.epochs):
@@ -137,12 +147,10 @@ class ModelTrainer:
                 optimizer.zero_grad()
                 batch_X.requires_grad_(True)
                 
-                # Forward Pass
                 preds = model(batch_X)
                 pred_t_surf = preds[:, 0].unsqueeze(1)
                 pred_melt = preds[:, 1].unsqueeze(1)
-                
-                current_weather = batch_X[:, -1, :] # Last day in sequence
+                current_weather = batch_X[:, -1, :] 
                 
                 # --- A. DATA LOSS ---
                 valid_preds = torch.masked_select(pred_t_surf, batch_mask)
@@ -164,6 +172,7 @@ class ModelTrainer:
                 loss_physics = torch.mean(physics_residual ** 2)
 
                 # --- C. BOUNDARY LOSS ---
+                # Manual unscaling for (-1, 1) range
                 pred_unscaled = pred_t_surf * (self.scaler_y.data_max_[0] - self.scaler_y.data_min_[0]) / 2.0 + (self.scaler_y.data_max_[0] + self.scaler_y.data_min_[0]) / 2.0
                 loss_boundary = torch.mean(torch.relu(pred_unscaled - 0.0))
                 
@@ -180,17 +189,20 @@ class ModelTrainer:
                 epoch_loss += loss.item()
                 
             if (epoch + 1) % 50 == 0 or epoch == 0:
-                logger.info(f"Epoch {epoch+1:04d}/{self.config.epochs} | Total Loss: {epoch_loss:.4f} | "
-                            f"Learned C_h: {model.C_h.item():.4f} | Learned C_sw: {model.C_sw.item():.4f}")
+                logger.info(f"Seed {seed} | Epoch {epoch+1:04d}/{self.config.epochs} | Loss: {epoch_loss:.4f}")
                 
             loss_history.append({"epoch": epoch + 1, "loss": epoch_loss})
 
-        # --- STEP 3: SAVE MODEL & LOGS ---
-        logger.info("Step 3: Training complete. Saving artifacts...")
-        torch.save(model.state_dict(), self.config.trained_model_path)
-        pd.DataFrame(loss_history).to_csv(self.config.loss_log_path, index=False)
+        # --- STEP 3: SAVE MODEL WITH UNIQUE SEED NAME ---
+        logger.info(f"Step 3: Training complete for seed {seed}. Saving...")
         
+        # This makes sure each ensemble run gets its own file!
+        save_name = f"pinn_model_seed_{seed}.pth"
+        torch.save(model.state_dict(), Path(self.config.root_dir) / save_name)
+        
+        # Save loss history and scalers
+        pd.DataFrame(loss_history).to_csv(Path(self.config.root_dir) / f"loss_history_seed_{seed}.csv", index=False)
         joblib.dump(self.scaler_X, Path(self.config.root_dir) / "scaler_X.joblib")
         joblib.dump(self.scaler_y, Path(self.config.root_dir) / "scaler_y.joblib")
         
-        logger.info(f"Model and scalers successfully saved to: {self.config.root_dir}")
+        logger.info(f"Ensemble model saved to: {Path(self.config.root_dir) / save_name}")
