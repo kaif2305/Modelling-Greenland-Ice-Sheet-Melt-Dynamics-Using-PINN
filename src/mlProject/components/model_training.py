@@ -101,7 +101,13 @@ class ModelTrainer:
         self.mask_tensor = torch.tensor(seq_mask, dtype=torch.bool).to(self.device)
         
         dataset = TensorDataset(self.X_tensor, self.y_tensor, self.mask_tensor)
-        self.dataloader = DataLoader(dataset, batch_size=self.config.batch_size, shuffle=True)
+        self.dataloader = DataLoader(
+            dataset, 
+            batch_size=self.config.batch_size, 
+            shuffle=True, 
+            num_workers=4,   # Use 4 CPU cores to prep data
+            pin_memory=True  # Faster transfer to GPU
+            )
         
         logger.info(f"Sequencing complete. Total LSTM windows: {len(seq_X)}")
 

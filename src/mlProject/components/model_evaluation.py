@@ -201,7 +201,11 @@ class ModelEvaluation:
             mlflow.log_artifact(str(Path(self.config.root_dir) / "actual_vs_predicted.png"))
             mlflow.log_artifact(str(Path(self.config.root_dir) / "ensemble_uncertainty_timeseries.png"))
 
+            # Safely save and upload the raw model weights to avoid PyTorch version crashes
+            model_save_path = str(Path(self.config.root_dir) / "Greenland_Ensemble_PINN.pth")
+            torch.save(base_model.state_dict(), model_save_path)
+            
             if tracking_url_type_store != "file":
-                mlflow.pytorch.log_model(base_model, "model", registered_model_name="Greenland_Ensemble_PINN")
+                mlflow.log_artifact(model_save_path, artifact_path="model")
             else:
-                mlflow.pytorch.log_model(base_model, "model")
+                mlflow.log_artifact(model_save_path, artifact_path="model")

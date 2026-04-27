@@ -12,7 +12,7 @@ model_training:
   seq_length: 7          # NEW: LSTM looks at the past 7 days of weather
   
   # Training Loop
-  epochs: 2
+  epochs: 5000
   batch_size: 1024       # Reduced slightly for LSTM memory constraints
   learning_rate: 0.001
   optimizer: "Adam"
