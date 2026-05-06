@@ -37,6 +37,7 @@ model_trainer:
 model_evaluation:
   root_dir: artifacts/model_evaluation
   test_data_path: artifacts/data_transformation/master_space_time_data.csv
+  model_path: artifacts/model_trainer
   model_dir: artifacts/model_trainer  # <--- THIS IS THE ONLY CHANGE
   scaler_X_path: artifacts/model_trainer/scaler_X.joblib
   scaler_y_path: artifacts/model_trainer/scaler_y.joblib
