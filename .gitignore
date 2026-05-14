@@ -19,3 +19,7 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+
+test.py
+geographical_error_map.png
+research/
