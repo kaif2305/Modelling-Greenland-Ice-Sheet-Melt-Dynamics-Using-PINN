@@ -1,0 +1,21 @@
+pandas 
+numpy
+scipy
+dagshub
+geopandas
+torch
+scikit-learn
+matplotlib
+seaborn
+mlflow
+notebook
+python-box
+pyYAML
+types-PyYAML
+tqdm
+ensure
+joblib
+pyarrow
+Flask
+Flask-Cors
+# -e .
