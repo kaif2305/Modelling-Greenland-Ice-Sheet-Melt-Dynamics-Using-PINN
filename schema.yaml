@@ -17,6 +17,10 @@ columns:
   rh_u: float64
   wspd_u: float64
   albedo: float64
+  dsr: float64
+  usr: float64
+  dlr: float64
+  ulr: float64
   
   # Targets & Metadata
   station_name: object
